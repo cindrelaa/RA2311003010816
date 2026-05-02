@@ -241,24 +241,45 @@ function notify_all(student_ids, message):
 
 # Stage 6
 
+# Stage 6
+
 ## Code Implementation (JavaScript)
 
-function getTopNotifications(notifications) {
+const axios = require("axios");
+
+const TOKEN = process.env.TOKEN;
+
+async function getTopNotifications() {
+  const res = await axios.get(
+    "http://20.207.122.201/evaluation-service/notifications",
+    {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`
+      }
+    }
+  );
+
+  const notifications = res.data.notifications;
+
   const priority = {
     Placement: 3,
     Result: 2,
     Event: 1
   };
 
-  return notifications
-    .sort((a, b) => {
-      if (priority[b.type] !== priority[a.type]) {
-        return priority[b.type] - priority[a.type];
-      }
-      return new Date(b.timestamp) - new Date(a.timestamp);
-    })
-    .slice(0, 10);
+  const sorted = notifications.sort((a, b) => {
+    if (priority[b.Type] !== priority[a.Type]) {
+      return priority[b.Type] - priority[a.Type];
+    }
+    return new Date(b.Timestamp) - new Date(a.Timestamp);
+  });
+
+  return sorted.slice(0, 10);
 }
+
+getTopNotifications().then(data => {
+  console.log("Top Notifications:", data);
+});
 
 ---
 
